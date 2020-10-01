@@ -56,7 +56,7 @@ class KlipperPlugin(
             replace_connection_panel=True
          ),
          macros = [dict(
-            name="E-Stop",
+            name="Emergency-Stop",
             macro="M112",
             sidebar=True,
             tab=True
