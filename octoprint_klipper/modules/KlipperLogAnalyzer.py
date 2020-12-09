@@ -43,7 +43,7 @@ class KlipperLogAnalyzer():
       out = []
 
       try:
-         f = open(logname, 'rb')
+         f = open(logname, 'r')
 
          for line in f:
             parts = line.split()
