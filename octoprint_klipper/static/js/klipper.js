@@ -81,7 +81,11 @@ $(function() {
               });
            }
         }
-     
+
+        self.navbarClicked = function() {
+            $("#tab_plugin_klipper_main_link").find("a").click();
+        }
+
         self.onGetStatus = function() {
            OctoPrint.control.sendGcode("Status")
         }
