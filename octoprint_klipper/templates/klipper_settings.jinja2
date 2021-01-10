@@ -57,7 +57,7 @@
        </div>
     </div>
     <div data-bind="foreach: settings.settings.plugins.klipper.macros">   
-       <div class="control-group">
+       <div class="item">
            <label class="control-label">{{ _('Name') }}</label>
            <div class="controls">
                 <div class="row-fluid">
@@ -77,8 +77,9 @@
                   </div>
                 </div>
            </div>
-           <label class="control-label">{{ _('Command') }}</label>
-           <div class="controls">
+           <!--ko ifnot:name() == "HLine"-->
+             <label class="control-label">{{ _('Command') }}</label>
+             <div class="controls">
                <div class="row-fluid">
                  <div class="span8">
                     <textarea rows="2" class="block" data-bind="value: macro">
@@ -86,12 +87,15 @@
                  </div>
                  <div class="span2"></div>
                </div>
-           </div>
+             </div>
+           <!-- /ko -->
        </div>
     </div>
     <div class="control-group">
       <div class="controls">
         <a href='#' data-bind='click: addMacro' class="fa fa-plus-circle"></a> {{ _('Add Macro') }}
+        <br>
+        <a href='#' data-bind='click: addLine' class="fa fa-plus-circle"></a> {{ _('Add Line') }}
       </div>
     </div>
     <div class="control-group">

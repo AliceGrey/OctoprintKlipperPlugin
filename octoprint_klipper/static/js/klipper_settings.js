@@ -27,6 +27,15 @@ $(function() {
               tab: true
            });
         }
+
+        self.addLine = function() {
+         self.settings.settings.plugins.klipper.macros.push({
+            name: 'HLine',
+            macro: '',
+            sidebar: true,
+            tab: true
+         });
+        }
         
         self.removeMacro = function(macro) {
            self.settings.settings.plugins.klipper.macros.remove(macro);

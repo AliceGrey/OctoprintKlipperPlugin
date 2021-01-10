@@ -13,6 +13,14 @@
    color: #333;
 }
 
+#macros .item { 
+   margin-bottom: 5px;
+   border: 1px solid #ddd;
+   border-radius: 3px;
+   background-color: #eeeeef;
+   color: #333;
+}
+
 .plugin-klipper-log .error {
    background-color: #eebabb;
 }

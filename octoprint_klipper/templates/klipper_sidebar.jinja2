@@ -9,9 +9,20 @@
    <div class="controls">
       <label class="control-label small"><i class="icon-list-alt"></i> {{ _('Macros') }}</label>
       <div data-bind="foreach: settings.settings.plugins.klipper.macros">
-         <!-- ko if: sidebar -->
-         <button class="btn btn-block" data-bind="text: name, click: $parent.executeMacro, enable: $parent.isActive()"></button>
-         <!-- /ko -->
+        <!-- ko if: name() == "HLine" -->
+          <!-- ko if: sidebar -->
+            <hr style="background-color:#B0B0B0;border-width:0;color:#B0B0B0;height:2px;line-height:0;width:80%;margin-left:auto;margin-right:auto;margin-top:0.2em;margin-bottom:0.2em" />
+          <!-- /ko -->
+          <!-- ko ifnot: sidebar -->
+          <!-- /ko -->
+        <!-- /ko -->
+        <!-- ko if: name() != "HLine" -->
+          <!-- ko if: sidebar -->
+           <button class="btn btn-block" data-bind="text: name, click: $parent.executeMacro, enable: $parent.isActive()"></button>
+          <!-- /ko -->
+          <!-- ko ifnot: sidebar -->
+          <!-- /ko -->
+        <!-- /ko -->
       </div>
    </div>
 </div>
