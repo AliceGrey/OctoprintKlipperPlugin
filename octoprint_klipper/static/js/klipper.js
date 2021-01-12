@@ -22,6 +22,7 @@ $(function() {
         self.connectionState = parameters[2];
         self.levelingViewModel = parameters[3];
         self.paramMacroViewModel = parameters[4];
+        self.access = parameters[5];
         
         self.shortStatus = ko.observable();
         self.logMessages = ko.observableArray();
@@ -127,6 +128,25 @@ $(function() {
         self.isActive = function() {
            return self.connectionState.isOperational() && self.loginState.isUser();
         }
+
+        // OctoKlipper settings link
+        self.openOctoKlipperSettings = function(profile_type) {
+
+         if (
+            !self.loginState.hasPermission(
+                self.access.permissions.PLUGIN_KLIPPER_CONFIG
+            )
+         )
+            return;
+
+         $('a#navbar_show_settings').click();
+         $('li#settings_plugin_klipper_link a').click();
+         if(profile_type)
+         {
+             var query= "#klipper-settings a[data-profile-type='"+profile_type+"']";
+             $(query).click();
+         }
+        };
     }
 
     OCTOPRINT_VIEWMODELS.push({
@@ -136,7 +156,8 @@ $(function() {
            "loginStateViewModel",
            "connectionViewModel",
            "klipperLevelingViewModel",
-           "klipperMacroDialogViewModel"
+           "klipperMacroDialogViewModel",
+           "accessViewModel"
         ],
         elements: ["#tab_plugin_klipper_main", "#sidebar_plugin_klipper", "#navbar_plugin_klipper"]
     });

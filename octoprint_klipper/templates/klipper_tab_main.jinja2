@@ -1,6 +1,11 @@
 <div class="row-fluid">
   <div class="span8">
-    <label><i class="icon-tasks"></i> {{ _('Messages') }}</label>
+    <label><i class="icon-tasks"></i> {{ _('Messages') }}
+      <a title="Open printer.cfg" 
+         data-bind="visible: loginState.hasPermissionKo(access.permissions.PLUGIN_KLIPPER_CONFIG), click: function() {openOctoKlipperSettings('klipper-config');}" style="float:right">
+         <i class="fa fa-file-code-o fa-lg"></i> printer.cfg
+      </a>
+    </label>
     <div class="plugin-klipper-log" data-bind="foreach: logMessages">
       <div class="log-item" data-bind="css: type">
          <div data-bind="text: time" class="ts" ></div>

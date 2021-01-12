@@ -21,8 +21,10 @@ import glob
 import os
 import sys
 from octoprint.util.comm import parse_firmware_line
+from octoprint.access.permissions import Permissions, ADMIN_GROUP, USER_GROUP
 from .modules import KlipperLogAnalyzer
 import flask
+from flask_babel import gettext
 
 class KlipperPlugin(
       octoprint.plugin.StartupPlugin,
@@ -49,6 +51,17 @@ class KlipperPlugin(
 
    #-- Settings Plugin
 
+   def get_additional_permissions(self, *args, **kwargs):
+        return [
+            dict(key="CONFIG",
+                name="Config Klipper",
+                description=gettext("Allows to config klipper"),
+                default_groups=[ADMIN_GROUP],
+                dangerous=True,
+                roles=["admin"]
+            )
+        ]
+   
    def get_settings_defaults(self):
       return dict(
          connection = dict(
@@ -357,6 +370,7 @@ def __plugin_load__():
    global __plugin_hooks__
    __plugin_implementation__ = KlipperPlugin()
    __plugin_hooks__ = {
+      "octoprint.access.permissions": __plugin_implementation__.get_additional_permissions,
       "octoprint.comm.protocol.gcode.received": __plugin_implementation__.on_parse_gcode,
       "octoprint.plugin.softwareupdate.check_config": __plugin_implementation__.get_update_information
    }
