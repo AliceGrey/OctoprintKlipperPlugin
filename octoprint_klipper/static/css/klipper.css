@@ -40,6 +40,50 @@
    font-family: monospace;
 }
 
+ul#klipper-settings { 
+   margin: 0;
+   /* height: 5%; */
+}
+
+#klipper-settings a{ 
+   margin: 5px;
+}
+
+#settings_plugin_klipper {
+   height: 100%;
+}
+
+#settings_plugin_klipper .form-horizontal{
+   margin: 0px;
+   height: 100%;
+}
+
+#settings_plugin_klipper .tab-content{
+   height: calc(100% - 40px);
+}
+
+#conf {
+   height:100%;
+}
+
+#conf textarea {
+   height: 100%;
+   resize: none;
+}
+
+#conf .control-group {
+   margin-bottom: 0px;
+   height: 99%;
+}
+
+#level .add-on {
+   padding: 5px;
+}
+
+#level .controls {
+   padding: 1px;
+}
+
 #klipper_graph_dialog form {
 	margin: 0;
 }
