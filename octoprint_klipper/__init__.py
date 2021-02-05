@@ -75,7 +75,8 @@ class KlipperPlugin(
          configuration = dict(
             configpath="~/printer.cfg",
             logpath="/tmp/klippy.log",
-            reload_command="RESTART"
+            reload_command="RESTART",
+            navbar=True
          )
       )
 

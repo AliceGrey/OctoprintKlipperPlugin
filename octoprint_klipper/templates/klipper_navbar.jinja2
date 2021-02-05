@@ -1,1 +1,3 @@
-<a data-bind="text: shortStatus, click: navbarClicked"></a>
+<!-- ko if: settings.settings.plugins.klipper.configuration.navbar -->
+    <a data-bind="text: shortStatus, click: navbarClicked"></a>
+<!-- /ko -->
