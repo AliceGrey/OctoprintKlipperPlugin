@@ -7,6 +7,11 @@
 </div>
 <div class="control-group">
    <div class="controls">
+      <button class="btn btn-block" data-bind="visible: loginState.hasPermissionKo(access.permissions.PLUGIN_KLIPPER_CONFIG), click: function() {openOctoKlipperSettings('klipper-config');}">{{ _('Open Klipper config') }}</button>
+   </div>
+</div>
+<div class="control-group">
+   <div class="controls">
       <label class="control-label small"><i class="icon-list-alt"></i> {{ _('Macros') }}</label>
       <div data-bind="foreach: settings.settings.plugins.klipper.macros">
          <!-- ko if: sidebar -->
