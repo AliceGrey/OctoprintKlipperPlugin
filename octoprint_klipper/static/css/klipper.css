@@ -135,7 +135,7 @@ div#settings_plugin_klipper div.tab-content div#conf.tab-pane div.control-group 
 
 div#settings_plugin_klipper div.tab-content div#conf.tab-pane div.control-group div.editor-controls{
    margin-bottom: 0px;
-   height: 26px;
+   height: 55px;
 }
 
 div#settings_plugin_klipper div.tab-content div#conf.tab-pane div.control-group div.conf-editor {
@@ -187,6 +187,36 @@ div#settings_plugin_klipper.tab-pane.active form.form-horizontal div.tab-content
    color: #333;
    padding-bottom: 2px;
    padding-top: 2px;
+}
+
+#klipper_files_checkbox {
+   text-align: center;
+   width: 10px;
+   margin-top: 0;
+}
+
+#klipper_files_name {
+   text-overflow: ellipsis;
+   text-align: left;
+}
+
+#klipper_files_size {
+   text-align: right;
+   width: 55px;
+}
+
+#klipper_unrendered_size {
+   text-align: right;
+   width: 55px;
+}
+
+#klipper_unrendered_count {
+   text-align: right;
+   width: 45px;
+}
+
+#klipper_files_action {
+   width: 60px;
 }
 
 #klipper_graph_dialog {

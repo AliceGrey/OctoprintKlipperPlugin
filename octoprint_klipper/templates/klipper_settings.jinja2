@@ -220,51 +220,15 @@
         &nbsp;&nbsp;
         <a href='#' data-bind="click: minusFontsize" title="{{ _('Decrease Fontsize') }}" class="fas fa-search-minus"></a>
         <a href='#' data-bind="click: plusFontsize" title="{{ _('Increase Fontsize') }}" class="fas fa-search-plus"></a>
+        <button
+          class="btn btn-block btn-small"
+          data-bind="click: showEditorDialog"
+          title="Open Config File."
+          > {{ _("Open File") }}
+          </button>
       </div>
-      <div class="conf-files">
-        <div class="pull-right">
-          <div class="btn-group">
-            <button class="btn btn-small dropdown-toggle" data-toggle="dropdown"><i class="fas fa-wrench"></i> <span class="caret"></span></button>
-            <ul class="dropdown-menu dropdown-menu-right">
-              <li><a href="javascript:void(0)" data-bind="click: function() { listHelper.changeSorting('name'); }"><i class="fas fa-check" data-bind="style: {visibility: listHelper.currentSorting() == 'name' ? 'visible' : 'hidden'}"></i> {{ _('Sort by name') }} ({{ _('ascending') }})</a></li>
-              <li><a href="javascript:void(0)" data-bind="click: function() { listHelper.changeSorting('date'); }"><i class="fas fa-check" data-bind="style: {visibility: listHelper.currentSorting() == 'date' ? 'visible' : 'hidden'}"></i> {{ _('Sort by date') }} ({{ _('descending') }})</a></li>
-              <li><a href="javascript:void(0)" data-bind="click: function() { listHelper.changeSorting('size'); }"><i class="fas fa-check" data-bind="style: {visibility: listHelper.currentSorting() == 'size' ? 'visible' : 'hidden'}"></i> {{ _('Sort by file size') }} ({{ _('descending') }})</a></li>
-            </ul>
-          </div>
-        </div>
-        <div class="pull-left" data-bind="visible: hasRight('DELETE_FILES', 'Ko')">
-          <div class="btn-group">
-            <button class="btn btn-small dropdown-toggle" data-toggle="dropdown"><i class="far fa-square"></i> <span class="caret"></span></button>
-              <ul class="dropdown-menu">
-                <li><a href="javascript:void(0)" data-bind="click: markFilesOnPage">{{ _('Select all on this page') }}</a></li>
-                <li><a href="javascript:void(0)" data-bind="click: markAllFiles">{{ _('Select all') }}</a></li>
-                <li class="divider"></li>
-                <li><a href="javascript:void(0)" data-bind="click: clearMarkedFiles">{{ _('Clear selection') }}</a></li>
-              </ul>
-            </div>
-          <button class="btn btn-small" data-bind="click: removeMarkedFiles, enable: markedForFileDeletion().length > 0">{{ _('Delete selected') }}</button>
-        </div>
-        <table class="table table-striped table-hover table-condensed table-hover" id="timelapse_files">
-          <thead>
-            <tr>
-              <th class="timelapse_files_checkbox"></th>
-              <th class="timelapse_files_name">{{ _('Name') }}</th>
-              <th class="timelapse_files_size">{{ _('Size') }}</th>
-              <th class="timelapse_files_action">{{ _('Action') }}</th>
-            </tr>
-          </thead>
-          <tbody data-bind="foreach: listHelper.paginatedItems">
-            <tr data-bind="attr: {title: name}">
-              <td class="timelapse_files_checkbox"><input type="checkbox" data-bind="value: name, checked: $root.markedForFileDeletion, invisible: !hasRight('DELETE_FILES', 'Ko'))()"></td>
-              <td class="timelapse_files_name" data-bind="text: name"></td>
-              <td class="timelapse_files_size" data-bind="text: size"></td>
-              <td class="timelapse_files_action"><a href="javascript:void(0)" class="far fa-trash-alt" data-bind="click: function() { $parent.removeFile($data.name); }, css: {disabled: !hasRight('DELETE_FILES', 'Ko'))() }"></a>&nbsp;|&nbsp;<a href="javascript:void(0)" class="fas fa-download" data-bind="css: {disabled: !hasRight('DOWNLOAD_FILES', 'Ko'))()}, attr: { href: (hasRight('DOWNLOAD_FILES', 'Ko'))) ? $data.url : 'javascript:void(0)' }"></a>&nbsp;|&nbsp;<a href="javascript:void(0)" class="fas fa-camera" data-bind="css: {disabled: !$root.isFileEditable($data)}, click: $root.showFileEditor"></a></td>
-            </tr>
-          </tbody>
-        </table>
         <input id="hdnLoadKlipperConfig" type="hidden" data-bind="value: configBound(settings.settings.plugins.klipper.config)" />
         <div id="plugin-klipper-config"></div>
-      </div>
     </div>
   </div>
 </div>

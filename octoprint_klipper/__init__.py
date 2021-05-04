@@ -26,6 +26,8 @@ from octoprint.access.permissions import Permissions, ADMIN_GROUP, USER_GROUP
 from .modules import KlipperLogAnalyzer
 import flask
 from flask_babel import gettext
+from distutils.version import LooseVersion
+import octoprint_klipper.utility as ut
 
 try:
     import configparser
@@ -41,11 +43,19 @@ class KlipperPlugin(
         octoprint.plugin.SettingsPlugin,
         octoprint.plugin.AssetPlugin,
         octoprint.plugin.SimpleApiPlugin,
+        octoprint.plugin.BlueprintPlugin,
         octoprint.plugin.EventHandlerPlugin):
 
     _parsing_response = False
     _parsing_check_response = True
     _message = ""
+
+    if LooseVersion(octoprint.server.VERSION) >= LooseVersion("1.4"):
+        import octoprint.access.permissions as permissions
+        admin_permission = permissions.Permissions.ADMIN
+    else:
+        import flask_principal
+        admin_permission = flask_principal.Permission(flask_principal.RoleNeed('admin'))
 
     def __init__(self):
         self._logger = logging.getLogger("octoprint.plugins.klipper")
@@ -162,8 +172,8 @@ class KlipperPlugin(
             "Save klipper configs"
         )
 
-        if "config" in data:
-            if self.key_exist(data, "configuration", "parse_check"):
+        if "config" in data and admin_permission:
+            if ut.key_exist(data, "configuration", "parse_check"):
                 check_parse = data["configuration"]["parse_check"]
             else:
                 check_parse = self._settings.get(["configuration", "parse_check"])
@@ -172,7 +182,7 @@ class KlipperPlugin(
                 data["config"] = data["config"].encode('utf-8')
 
             # check for configpath if it was changed during changing of the configfile
-            if self.key_exist(data, "configuration", "configpath"):
+            if ut.key_exist(data, "configuration", "configpath"):
                 configpath = os.path.expanduser(
                     data["configuration"]["configpath"]
                 )
@@ -193,7 +203,7 @@ class KlipperPlugin(
                     self.log_error("Error: Couldn't write Klipper config file: {}".format(configpath))
                 else:
                     #load the reload command from changed data if it is not existing load the saved setting
-                    if self.key_exist(data, "configuration", "reload_command"):
+                    if ut.key_exist(data, "configuration", "reload_command"):
                         reload_command = os.path.expanduser(
                             data["configuration"]["reload_command"]
                         )
@@ -421,56 +431,21 @@ class KlipperPlugin(
             listLogFiles=[],
             getStats=["logFile"],
             reloadConfig=[],
-            checkConfig=["config"]
+            checkConfig=["config"],
+            requestConfigfiles=[],
+            deleteConfigfile=["file"]
         )
 
     def on_api_command(self, command, data):
         if command == "listLogFiles":
-            files = []
-            logpath = os.path.expanduser(
-                self._settings.get(["configuration", "logpath"])
-            )
-            if self.file_exist(logpath):
-                for f in glob.glob(self._settings.get(["configuration", "logpath"]) + "*"):
-                    filesize = os.path.getsize(f)
-                    files.append(dict(
-                        name=os.path.basename(
-                            f) + " ({:.1f} KB)".format(filesize / 1000.0),
-                        file=f,
-                        size=filesize
-                    ))
-                return flask.jsonify(data=files)
-            else:
-                return flask.jsonify(data=files)
+            return self.listLogFiles(data)
         elif command == "getStats":
             if "logFile" in data:
                 log_analyzer = KlipperLogAnalyzer.KlipperLogAnalyzer(
                     data["logFile"])
                 return flask.jsonify(log_analyzer.analyze())
         elif command == "reloadConfig":
-            data = octoprint.plugin.SettingsPlugin.on_settings_load(self)
-
-            configpath = os.path.expanduser(
-                self._settings.get(["configuration", "configpath"])
-            )
-
-            try:
-                f = open(configpath, "r")
-                data["config"] = f.read()
-                f.close()
-            except IOError:
-                self.log_error(
-                    "Error: Klipper config file not found at: {}".format(
-                        configpath)
-                )
-            else:
-
-                self._settings.set(["config"], data["config"])
-                # self.send_message("reload", "config", "", data["config"])
-                # send the configdata to frontend to update ace editor
-                if sys.version_info[0] < 3:
-                    data["config"] = data["config"].decode('utf-8')
-                return flask.jsonify(data=data["config"])
+            return self.reloadConfig(data)
         elif command == "checkConfig":
             if "config" in data:
                 if not self.validate_configfile(data["config"]):
@@ -481,6 +456,89 @@ class KlipperPlugin(
                     self.log_debug("validateConfig ok")
                     self._settings.set(["configuration", "old_config"], "")
                     return flask.jsonify(checkConfig="OK")
+        elif command == "requestConfigfiles":
+            return self.requestConfigfiles()
+        elif command == "deleteConfigfile":
+            return self.deleteConfigfile(data)
+
+    def listLogFiles(self, data):
+        files = []
+        logpath = os.path.expanduser(
+            self._settings.get(["configuration", "logpath"])
+        )
+        if self.file_exist(logpath):
+            for f in glob.glob(self._settings.get(["configuration", "logpath"]) + "*"):
+                filesize = os.path.getsize(f)
+                files.append(dict(
+                    name=os.path.basename(
+                        f) + " ({:.1f} KB)".format(filesize / 1000.0),
+                    file=f,
+                    size=filesize
+                ))
+            return flask.jsonify(data=files)
+        else:
+            return flask.jsonify(data=files)
+
+    def reloadConfig(self, data):
+        data = octoprint.plugin.SettingsPlugin.on_settings_load(self)
+
+        configpath = os.path.expanduser(
+            self._settings.get(["configuration", "configpath"])
+        )
+
+        try:
+            f = open(configpath, "r")
+            data["config"] = f.read()
+            f.close()
+        except IOError:
+            self.log_error(
+                "Error: Klipper config file not found at: {}".format(
+                    configpath)
+            )
+        else:
+            self._settings.set(["config"], data["config"])
+            # self.send_message("reload", "config", "", data["config"])
+            # send the configdata to frontend to update ace editor
+            if sys.version_info[0] < 3:
+                data["config"] = data["config"].decode('utf-8')
+            return flask.jsonify(data=data["config"])
+
+    def requestConfigfiles(self):
+        files = []
+        if not Permissions.PLUGIN_KLIPPER_CONFIG.can():
+            return flask.make_response("Insufficient rights", 403)
+
+        configpath = os.path.expanduser(
+            self._settings.get(["configuration", "configpath"])
+        )
+        if os.path.isdir(configpath):
+            for f in glob.glob(configpath + "*"):
+                filesize = os.path.getsize(f)
+                filedate = self.get_file_creation_date(f)
+                files.append(dict(
+                    name=os.path.basename(
+                        f) + " ({:.1f} KB)".format(filesize / 1000.0),
+                    file=f,
+                    size=filesize,
+                    date=filedate
+                ))
+            return flask.jsonify(data=files)
+        else:
+            return flask.jsonify(data=files)
+
+    def deleteConfigfile(self, data):
+        if not Permissions.PLUGIN_KLIPPER_CONFIG.can():
+                return flask.make_response("Insufficient rights", 403)
+        if "file" in data:
+            if self.file_exist(data["file"]):
+                try:
+                    os.remove(data["file"])
+                except Exception as ex:
+                    self.log_error(
+                    "Error deleting config file {}".format(data["file"])
+                    )
+                    return make_response("Unexpected error: {}".format(ex), 500)
+                return self.requestConfigfiles()
 
     def get_update_information(self):
         return dict(
@@ -507,6 +565,21 @@ class KlipperPlugin(
         )
 
     #-- Helpers
+    def get_file_creation_date(self, path):
+        if sys.platform == "win32":
+            # getctime always returns the creation date of a file, exactly what we want.
+            # in Linux this could be the st_ctime, which is always later than or equal to the
+            # modification date, so only trust this for windows.
+            return os.path.getctime(path)
+        # get file statistics
+        stat = os.stat(path)
+        if hasattr(stat, 'st_birthtime'):
+            # Not all OSs support st_birthtime, which is an actual creation date
+            return stat.st_birthtime
+
+        # for any other OS get the last content modification date.
+        return stat.st_mtime
+
     def send_message(self, type, subtype, title, payload):
         self._plugin_manager.send_plugin_message(
             self._identifier,
@@ -545,14 +618,6 @@ class KlipperPlugin(
         if not os.path.isfile(filepath):
             self.send_message("PopUp", "warning", "OctoKlipper Settings",
                               "Klipper " + filepath + " does not exist!")
-            return False
-        else:
-            return True
-
-    def key_exist(self, dict, key1, key2):
-        try:
-            dict[key1][key2]
-        except KeyError:
             return False
         else:
             return True
