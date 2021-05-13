@@ -85,6 +85,15 @@ $(function () {
             });
         };
 
+        self.showEditorDialog = function () {
+            var dialog = $("#klipper_editor_dialog");
+            dialog.modal({
+                show: "true",
+                minHeight: "500px",
+                maxHeight: "600px"
+            });
+        };
+
         self.executeMacro = function (macro) {
             var paramObjRegex = /{(.*?)}/g;
 

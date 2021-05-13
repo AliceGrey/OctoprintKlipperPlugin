@@ -336,6 +336,12 @@ class KlipperPlugin(
             ),
             dict(
                 type="generic",
+                name="Config Editor",
+                template="klipper_editor_dialog.jinja2",
+                custom_bindings=True
+            ),
+            dict(
+                type="generic",
                 name="Macro Dialog",
                 template="klipper_param_macro_dialog.jinja2",
                 custom_bindings=True
@@ -352,7 +358,8 @@ class KlipperPlugin(
                 "js/klipper_pid_tuning.js",
                 "js/klipper_offset.js",
                 "js/klipper_param_macro.js",
-                "js/klipper_graph.js"
+                "js/klipper_graph.js",
+                "js/klipper_editor.js"
                 ],
             css=["css/klipper.css"]
         )
